@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>414</width>
+    <height>185</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>pyNTP</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>161</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>运行状态</string>
+    </property>
+    <widget class="QLabel" name="label_utc">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>当前UTC 时间：</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_local">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>当前本地时间：</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_show_utc">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>141</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1970-01-01 00:00:00</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_show_local">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>141</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1970-01-01 00:00:00</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>10</y>
+      <width>221</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>配置</string>
+    </property>
+    <widget class="QLabel" name="label_ip">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>54</width>
+       <height>12</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>绑定ip  ：</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_port">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>54</width>
+       <height>12</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>绑定端口：</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="edit_bind_ip">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>19</y>
+       <width>141</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0.0.0.0</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="edit_bind_port">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>40</y>
+       <width>141</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>123</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>51</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>设定时间</string>
+     </property>
+    </widget>
+    <widget class="QDateTimeEdit" name="edit_date_time">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>60</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="displayFormat">
+      <string>yyyy-MM-dd HH:mm:ss</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_use_config">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>110</y>
+       <width>141</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>应用配置启动</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_use_default">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>默认</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>54</width>
+       <height>12</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>本地时区：</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>85</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <property name="currentIndex">
+      <number>19</number>
+     </property>
+     <item>
+      <property name="text">
+       <string>-11</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-10</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-9</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-8</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-7</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-6</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-5</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-3</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>-1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+3</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+5</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+6</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+7</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+8</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+9</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+10</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+11</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+12</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>+13</string>
+      </property>
+     </item>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="label_info">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>系统信息</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

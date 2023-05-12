@@ -6,19 +6,6 @@ import queue
 import threading
 import select
 
-taskQueue = queue.Queue()
-stopFlag = False
-
-
-def stop_ntp_server():
-    global stopFlag
-    stopFlag = True
-
-
-def start_ntp_server():
-    global stopFlag
-    stopFlag = False
-
 
 def system_to_ntp_time(timestamp):
     """Convert a system time to a NTP time.
@@ -242,7 +229,7 @@ class NTPPacket:
         self.tx_timestamp_low = unpacked[14]
 
     def GetTxTimeStamp(self):
-        return (self.tx_timestamp_high, self.tx_timestamp_low)
+        return self.tx_timestamp_high, self.tx_timestamp_low
 
     def SetOriginTimeStamp(self, high, low):
         self.orig_timestamp_high = high
@@ -250,17 +237,16 @@ class NTPPacket:
 
 
 class RecvThread(threading.Thread):
-    def __init__(self, socket, delay=0):
+    def __init__(self, work_socket, task_queue, delay=0):
         threading.Thread.__init__(self)
-        self.socket = socket
-        # Customizable delay, can be used for testing or simulation an offset
-        # NTP server - default to Zero delay
+        self.socket = work_socket
+        self.stop_flag = False
+        self.task_queue = task_queue
         self.delay = delay
 
     def run(self):
-        global taskQueue, stopFlag
         while True:
-            if stopFlag:
+            if self.stop_flag:
                 print("RecvThread Ended")
                 break
             rlist, wlist, elist = select.select([self.socket], [], [], 1)
@@ -271,7 +257,7 @@ class RecvThread(threading.Thread):
                         data, addr = tempSocket.recvfrom(1024)
                         recvTimestamp = system_to_ntp_time(time.time() + self.delay)
                         print('RT = %d' % recvTimestamp)  # Receive Timestamp
-                        taskQueue.put((data, addr, recvTimestamp))
+                        self.task_queue.put((data, addr, recvTimestamp))
                     except socket.error as msg:
                         print("Socket error: %s" % msg)
             else:
@@ -281,30 +267,25 @@ class RecvThread(threading.Thread):
 
 
 class WorkThread(threading.Thread):
-    def __init__(self, socket):
+    def __init__(self, work_socket, task_queue):
         threading.Thread.__init__(self)
-        self.socket = socket
+        self.socket = work_socket
+        self.stop_flag = False
+        self.task_queue = task_queue
 
     def run(self):
-        global taskQueue, stopFlag
         while True:
-            if stopFlag:
+            if self.stop_flag:
                 print("WorkThread Ended")
                 break
             try:
-                data, addr, recvTimestamp = taskQueue.get(timeout=10)  # will generate an exception
-                recvPacket = NTPPacket(version=3, mode=3)  # we know this is version 4, client mode
+                data, addr, recvTimestamp = self.task_queue.get(timeout=5)  # will generate an exception
+                recvPacket = NTPPacket(version=3, mode=3)
                 recvPacket.from_data(data)
                 timeStamp_high, timeStamp_low = recvPacket.GetTxTimeStamp()
                 sendPacket = NTPPacket(version=3, mode=4)
                 sendPacket.stratum = 2
                 sendPacket.poll = 10
-                '''
-                sendPacket.precision = 0xfa
-                sendPacket.root_delay = 0x0bfa
-                sendPacket.root_dispersion = 0x0aa7
-                sendPacket.ref_id = 0x808a8c2c
-                '''
                 sendPacket.ref_timestamp = recvTimestamp - 5  # pretend the clock was updated slightly before
                 sendPacket.SetOriginTimeStamp(timeStamp_high, timeStamp_low)
                 sendPacket.recv_timestamp = recvTimestamp
@@ -321,27 +302,40 @@ class WorkThread(threading.Thread):
                 continue
 
 
-if __name__ == "__main__":
+class NtpServer(object):
+    def __init__(self, work_socket, delay=0):
+        self.queue = queue.Queue()
+        self.recv_thread = None
+        self.send_thread = None
+        self.config(work_socket, delay)
 
+    def config(self, work_socket, delay):
+        self.recv_thread = RecvThread(work_socket, self.queue, delay)
+        self.send_thread = WorkThread(work_socket, self.queue)
+
+    def stop_server(self):
+        print("Exiting...")
+        self.recv_thread.stop_flag = True
+        self.recv_thread.join()
+        self.send_thread.stop_flag = True
+        self.send_thread.join()
+        print("Exited")
+
+    def start_server(self):
+        self.recv_thread.stop_flag = False
+        self.send_thread.stop_flag = False
+        self.recv_thread.start()
+        self.send_thread.start()
+
+
+if __name__ == '__main__':
     listenIp = "0.0.0.0"
     listenPort = 123
     socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     socket.bind((listenIp, listenPort))
     print("local socket: %s " % str(socket.getsockname()))
 
-    recvThread = RecvThread(socket,600)  # Use 240 secs offset for testing
-    recvThread.start()
-    workThread = WorkThread(socket)
-    workThread.start()
-
-    while True:
-        try:
-            time.sleep(0.5)
-        except KeyboardInterrupt:
-            print("Exiting...")
-            stopFlag = True
-            recvThread.join()
-            workThread.join()
-
-            print("Exited")
-            break
+    my_ntp = NtpServer(socket, 600)
+    my_ntp.start_server()
+    time.sleep(60)
+    my_ntp.stop_server()
